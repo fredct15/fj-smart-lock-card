@@ -1,7 +1,7 @@
-/* FJ Smart Lock Card v1.0.1 — original independent Home Assistant card. MIT */
+/* FJ Smart Lock Card v1.0.2 — original independent Home Assistant card. MIT */
 const TAG='fj-smart-lock-card';
 class FJSmartLockCard extends HTMLElement {
-  constructor(){super();this.attachShadow({mode:'open'});this._tick=null;this._pending=null;this._notice='';}
+  constructor(){super();this.attachShadow({mode:'open'});this._tick=null;this._pending=null;this._notice='';this._lastRenderKey=null;}
   setConfig(config){if(!config.entity||!config.entity.startsWith('lock.'))throw Error('Choisir une entité lock.*');this.config={title:'Serrure',confirm_unlock:true,...config};this.render();}
   set hass(hass){this._hass=hass;this.render();}
   connectedCallback(){if(!this._tick)this._tick=setInterval(()=>this.render(),15000);}
@@ -9,7 +9,7 @@ class FJSmartLockCard extends HTMLElement {
   getCardSize(){return 3;}
   static getConfigElement(){return document.createElement('fj-smart-lock-card-editor');}
   static getStubConfig(hass){return {entity:Object.keys(hass?.states||{}).find(x=>x.startsWith('lock.'))||'lock.porte_arriere',title:'Porte arrière',confirm_unlock:true};}
-  since(s){if(!s?.last_changed)return 'durée inconnue';const m=Math.max(0,Math.floor((Date.now()-new Date(s.last_changed).getTime())/60000));if(m<1)return 'depuis moins d’une minute';if(m<60)return 'depuis '+m+' min';if(m<1440)return 'depuis '+Math.floor(m/60)+' h '+(m%60)+' min';return 'depuis '+Math.floor(m/1440)+' j '+Math.floor(m%1440/60)+' h';}
+  since(s){if(!s?.last_changed)return 'durée inconnue';const m=Math.max(0,Math.floor((Date.now()-new Date(s.last_changed).getTime())/60000));if(m<1)return 'À l’instant';if(m<60)return 'depuis '+m+' min';if(m<1440)return 'depuis '+Math.floor(m/60)+' h '+(m%60)+' min';return 'depuis '+Math.floor(m/1440)+' j '+Math.floor(m%1440/60)+' h';}
   render(){
     if(!this.shadowRoot||!this.config||!this._hass)return;
     const s=this._hass.states[this.config.entity],state=s?.state||'unavailable';
@@ -27,6 +27,11 @@ class FJSmartLockCard extends HTMLElement {
     const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const title=esc(this.config.title||s?.attributes?.friendly_name||'Serrure');
     const waiting=!!this._pending;
+    // Avoid replacing the spinner DOM node on frequent Home Assistant updates.
+    // Rebuild only when visible information changes.
+    const renderKey=JSON.stringify([this.config.entity,this.config.title,this.config.confirm_unlock,state,s?.last_changed,label,this.since(s),waiting,this._pending?.action,this._notice]);
+    if(renderKey===this._lastRenderKey)return;
+    this._lastRenderKey=renderKey;
     this.shadowRoot.innerHTML=`<style>
       :host{display:block}ha-card{padding:20px;border-radius:22px;color:var(--primary-text-color);background:var(--ha-card-background,var(--card-background-color,#fff));box-sizing:border-box}
       .eyebrow{font-size:11px;letter-spacing:1.5px;opacity:.6;font-weight:700}.title{font-size:21px;font-weight:700;margin:6px 0 16px}
