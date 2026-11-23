@@ -1,0 +1,35 @@
+name: Publish HACS release
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'fj-smart-lock-card.js'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read and validate version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(sed -nE '1s/.*(v[0-9]+\.[0-9]+\.[0-9]+).*/\1/p' fj-smart-lock-card.js)
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Missing semantic version on first JS line" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Publish version if not already released
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            echo "Release $VERSION already exists"
+          else
+            gh release create "$VERSION" fj-smart-lock-card.js --target "$GITHUB_SHA" --title "FJ Smart Lock Card $VERSION" --notes "Version $VERSION. Installation et mises à jour via HACS."
+          fi
