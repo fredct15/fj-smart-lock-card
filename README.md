@@ -13,7 +13,7 @@ Carte Lovelace Home Assistant indépendante, en français québécois.
 ## Installation
 1. Télécharger `fj-smart-lock-card.js` depuis ce dépôt.
 2. Copier dans `/config/www/fj-smart-lock-card.js`.
-3. Ajouter une ressource Lovelace **Module JavaScript** : `/local/fj-smart-lock-card.js?v=1.0.1`.
+3. Ajouter une ressource Lovelace **Module JavaScript** : `/local/fj-smart-lock-card.js?v=1.0.2`.
 4. Rafraîchir Home Assistant, puis ajouter la carte **FJ Smart Lock Card**.
 
 ## YAML
