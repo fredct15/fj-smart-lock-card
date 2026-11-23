@@ -1,4 +1,4 @@
-/* FJ Smart Lock Card v1.0.0 — original independent Home Assistant card. MIT */
+/* FJ Smart Lock Card v1.0.1 — original independent Home Assistant card. MIT */
 const TAG='fj-smart-lock-card';
 class FJSmartLockCard extends HTMLElement {
   constructor(){super();this.attachShadow({mode:'open'});this._tick=null;this._pending=null;this._notice='';}
