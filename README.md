@@ -13,7 +13,7 @@ Carte Lovelace Home Assistant indépendante, en français québécois.
 ## Installation
 1. Télécharger `fj-smart-lock-card.js` depuis ce dépôt.
 2. Copier dans `/config/www/fj-smart-lock-card.js`.
-3. Ajouter une ressource Lovelace **Module JavaScript** : `/local/fj-smart-lock-card.js?v=1.0.2`.
+3. Ajouter une ressource Lovelace **Module JavaScript** : `/local/fj-smart-lock-card.js?v=1.0.3`.
 4. Rafraîchir Home Assistant, puis ajouter la carte **FJ Smart Lock Card**.
 
 ## YAML
@@ -32,3 +32,7 @@ Remplacer `lock.porte_arriere` par l'entité réelle.
 - Ne pas confondre l'état de la serrure avec un capteur de porte ouverte/fermée.
 
 Licence MIT. Code original sans réutilisation du code d'Alarm Keeper Card.
+
+## v1.0.3
+- Palette claire et sombre inspirée des couleurs de référence choisies : vert pour verrouillée, bleu pour déverrouillée.
+- Couleurs du fond et des bordures adaptées au thème Home Assistant.
